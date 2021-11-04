@@ -70,7 +70,7 @@ if (isset($_REQUEST['action'])) {
         <label for="add_record_type">Type: </label>
         <select name="add_record[type]" id="add_record_type">
             <option value="">Select type</option>
-            <?php foreach(DNS_RECORD_TYPES as $type) {
+            <?php foreach(DNS_RECORD_TYPES as $type => $fields) {
                 echo '<option value="' . $type . '">' . $type . '</option>';
             } ?>
         </select>
@@ -96,13 +96,22 @@ if (isset($_REQUEST['action'])) {
             if ($result instanceof Exception) {
                 echo '<span class="error">' . $result->getMessage() . '</span>';
             } else {
-                if (isJson($result)) {
-                    $result = json_decode($result);
+	            if (isJson($result) || isJson($result->response)) {
+		            if (isset($result->response)) {
+			            $result = json_decode($result->response);
+		            } else {
+			            $result = json_decode($result);
+		            }
                     if (isset($result->error)) {
 	                    echo '<span class="error">' . $result->error . '</span>';
                     } elseif (isset($result->message)) {
 	                    echo '<span class="error">' . $result->message . '</span>';
                     } else {
+	                    if (isset($result->messages) && !empty($result->messages)) {
+                            foreach ($result->messages as $message) {
+                                echo '<span class="message">' . $message . '</span>';
+                            }
+                        }
                         if (!empty($result->errors)) {
 	                        foreach($result->errors as $key => $error_array) {
 		                        $error = $error_array;
@@ -112,7 +121,17 @@ if (isset($_REQUEST['action'])) {
                                 echo '<div class="error">' . $key . ' - ' . $error . '</div>';
                             }
                         } else {
-	                        print_r($result);
+                            if (isset($result->status) && !empty($result->status)) {
+                                if ($result->status === 'success') {
+                                    echo '<span class="success">Request was successful</span>';
+                                } else if ($result->status === 'error') {
+	                                echo '<span class="error">Request was unsuccessful</span>';
+                                } else {
+	                                echo $result->status;
+                                }
+                            } else {
+	                            print_r($result);
+                            }
                         }
                     }
                 } else {
@@ -129,8 +148,17 @@ if (isset($_REQUEST['action'])) {
         if ($records instanceof Exception) {
 	        echo '<span class="error">' . $records->getMessage() . '</span>';
         } else {
-            if (isJson($records)) {
-                $records = json_decode($records);
+            if(isset($records->messages) && !empty($records->messages)) {
+                foreach ($records->messages as $message) {
+                    echo '<span class="message">' . $message . '</span>';
+                }
+            }
+            if (isJson($records) || isJson($records->response)) {
+                if (isset($records->response)) {
+	                $records = json_decode($records->response);
+                } else {
+                    $records = json_decode($records);
+                }
                 if (isset($records->error)) {
 	                echo '<span class="error">' . $records->error . '</span>';
                 } elseif (isset($records->message)) {

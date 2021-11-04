@@ -11,7 +11,7 @@ class WS_DNS_API
 	 * @param $method string
 	 * @param $path   string
 	 * @param $data   object|null
-	 * @return bool|string|object|stdClass
+	 * @return bool|string
 	 * @throws Exception
 	 */
 	function makeApiRequest(string $method, string $path, object $data = null)	{
@@ -76,7 +76,9 @@ class WS_DNS_API
 		}
 
 		try {
-			return self::makeApiRequest('GET', '/v1/user/self/zone/' . $domain_name . '/record');
+			return (object) [
+				'response' => self::makeApiRequest('GET', '/v1/user/self/zone/' . $domain_name . '/record')
+			];
 		} catch (Exception $e) {
 			return $e;
 		}
@@ -87,13 +89,29 @@ class WS_DNS_API
 			$domain_name = DEFAULT_DOMAIN;
 		}
 
+		$messages = [];
+
 		try {
-			return self::makeApiRequest('POST', '/v1/user/self/zone/' . $domain_name . '/record', $data);
+			$removeDataNotPresentInRecordType = removeDataNotPresentInRecordType($data);
+			$data = $removeDataNotPresentInRecordType->data;
+			$messages = $removeDataNotPresentInRecordType->messages;
+		} catch (Exception $e) {
+			return $e;
+		}
+
+		try {
+			return (object) [
+				'response' => self::makeApiRequest('POST', '/v1/user/self/zone/' . $domain_name . '/record', $data),
+				'messages' => $messages
+			];
 		} catch (Exception $e) {
 			return $e;
 		}
 	}
 
+	/**
+	 * @throws Exception
+	 */
 	function removeRecord($domain_name = '', $record_id = null)	{
 		if (empty($domain_name)) {
 			$domain_name = DEFAULT_DOMAIN;
@@ -104,7 +122,9 @@ class WS_DNS_API
 		}
 
 		try {
-			return self::makeApiRequest('DELETE', '/v1/user/self/zone/' . $domain_name . '/record/' . $record_id);
+			return (object) [
+				'response' => self::makeApiRequest('DELETE', '/v1/user/self/zone/' . $domain_name . '/record/' . $record_id)
+			];
 		} catch (Exception $e) {
 			return $e;
 		}
