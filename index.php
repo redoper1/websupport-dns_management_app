@@ -167,19 +167,22 @@ if (isset($_REQUEST['action'])) {
                     if (isset($records->items)) {
                         $records = $records->items;
                         if (is_array($records)) {
+                            $table_header_html = '<tr class="head"><th>Type</th><th>Name</th><th>Content</th><th>TTL</th><th>Priority</th><th>Port</th><th>Weight</th><th>Note</th><th></th></tr>';
+	                        echo $table_header_html;
                             foreach ($records as $key => $record) {
                                 echo '<tr>';
-                                    echo '<td><span>Type:</span> <span>' . $record->type . '</span></td>';
-                                    echo '<td><span>Name:</span> <span>' . $record->name . '</span></td>';
-                                    echo '<td><span>Content:</span> <span>' . $record->content . '</span></td>';
-                                    echo '<td><span>TTL:</span> <span>' . $record->ttl . '</span></td>';
-                                    echo '<td><span>Priority:</span> <span>' . ($record->prio ?? null) . '</span></td>';
-                                    echo '<td><span>Port:</span> <span>' . ($record->port ?? null) . '</span></td>';
-                                    echo '<td><span>Weight:</span> <span>' . ($record->weight ?? null) . '</span></td>';
-                                    echo '<td><span>Note:</span> <span>' . $record->note . '</span></td>';
-                                    echo '<td><button type="submit" name="action" value="removeRecord-' . $record->id  . '">Remove record</button></td>';
+                                    echo '<td><span>' . $record->type . '</span></td>';
+                                    echo '<td><span>' . $record->name . '</span></td>';
+                                    echo '<td><span>' . $record->content . '</span></td>';
+                                    echo '<td><span>' . $record->ttl . '</span></td>';
+                                    echo '<td><span>' . ($record->prio ?? null) . '</span></td>';
+                                    echo '<td><span>' . ($record->port ?? null) . '</span></td>';
+                                    echo '<td><span>' . ($record->weight ?? null) . '</span></td>';
+                                    echo '<td><span>' . $record->note . '</span></td>';
+                                    echo '<td><button type="submit" class="remove-button" name="action" value="removeRecord-' . $record->id  . '">Remove record</button></td>';
                                 echo '</tr>';
                             }
+	                        echo $table_header_html;
                         } else {
                             print_r($records);
                         }
